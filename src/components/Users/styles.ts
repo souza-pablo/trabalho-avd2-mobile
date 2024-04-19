@@ -7,32 +7,31 @@ export const styles = StyleSheet.create({
   name: {
     flex: 1,
     // color: '#363F5F',
-    color: '#000',
+    color: "#000",
     fontSize: 18,
     marginLeft: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
   },
   button: {
     width: 56,
-    backgroundColor: '#E23C44',
+    backgroundColor: "#E23C44",
     borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 24,
   },
   middle: {
-    backgroundColor: '#F0F2F5',
+    backgroundColor: "#F0F2F5",
     flex: 1,
     marginRight: 2,
-    height: 80,
+    height: 120,
   },
   form: {
-    flexDirection: 'row',
-    width: '100%',
-  }
-})
-
+    flexDirection: "row",
+    width: "100%",
+  },
+});

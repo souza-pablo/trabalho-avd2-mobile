@@ -1,134 +1,165 @@
-import { useState } from 'react'
+import { useState } from "react";
 import {
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
   Alert,
   FlatList,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import Select from "../../components/Select";
+import { User, Users } from "../../components/Users";
+import { isValidCPF, isValidEmail } from "../../utils/validator";
+import { styles } from "./styles";
 
-import { styles } from './styles';
-import { Users } from "../../components/Users";
+export const Home = () => {
+  const [name, setName] = useState("");
+  const [cpf, setCPF] = useState("");
+  const [email, setEmail] = useState("");
+  const [city, setCity] = useState("VR");
+  const [users, setUsers] = useState<User[]>([]);
 
-type Props = {
-  id: string,
-  name: string,
-  email: string,
-  city: string
-}
-
-export function Home() {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [city, setCity] = useState('')
-  const [users, setUsers] = useState<Props[]>([])
-
-  function handleAddNewUser() {
-    if (name.trim() === '' && email.trim() === '' &&
-      city.trim() === '') {
-      return Alert.alert('Usuário', 'Favor preencha os campos')
+  const handleAddNewUser = () => {
+    if (name.trim() === "") {
+      return Alert.alert("Usuário", "Favor preencha o campo nome");
     }
+    if (!checkCPFValid(cpf)) return;
+    if (!checkEmailValid(email)) return;
+    if (checkRepeatedEmail(email)) return;
 
     const data = {
       id: String(new Date().getTime()),
       name,
+      cpf,
       email,
-      city
+      city,
+    };
+
+    console.log(data);
+    setUsers([...users, data]);
+    setName("");
+    setCPF("");
+    setEmail("");
+  };
+
+  const checkCPFValid = (cpf: string): boolean => {
+    if (isValidCPF(cpf)) {
+      return true;
     }
 
-    console.log(data)
-    setUsers([...users, data])
-    setName('')
-    setEmail('')
-    setCity('')
+    Alert.alert("CPF inválido");
+    return false;
+  };
 
-    // Criar uma validação com o email
-    // Nào pode cadastrar o mesmo email para usuários diferentes
-    // O cpf teve ter 11 caracteres
+  const checkEmailValid = (email: string): boolean => {
+    if (isValidEmail(email)) {
+      return true;
+    }
 
-  }
+    Alert.alert("Email inválido");
+    return false;
+  };
 
-  function handleRemoveUser(id: string) {
-    Alert.alert('Remover', 'Remover o usuário', [
+  const checkRepeatedEmail = (email: string): boolean => {
+    const hasRepeatedEmail = users.map((user) => user.email).includes(email);
+
+    if (hasRepeatedEmail) {
+      Alert.alert(
+        "Não foi possível registrar email, há um usuário que já o possui"
+      );
+      return true;
+    }
+
+    return false;
+  };
+
+  const handleRemoveUser = (id: string) => {
+    Alert.alert("Remover", "Remover o usuário", [
       {
-        text: 'Sim',
-        onPress: () => setUsers(users =>
-          users.filter(user => user.id !== id))
+        text: "Sim",
+        onPress: () =>
+          setUsers((users) => users.filter((user) => user.id !== id)),
       },
       {
-        text: 'Nao',
-        style: 'cancel'
-      }
-    ])
-  }
+        text: "Nao",
+        style: "cancel",
+      },
+    ]);
+  };
+
+  const handleCityFromSelect = (city: string) => {
+    setCity(city);
+  };
+
+  const handleTotal = () => {
+    const totalUsuarios = users.length;
+    const totalVR = users.filter((user) => user.city === "VR").length;
+    const totalBMOuPH = users.filter(
+      (user) => user.city === "BM" || user.city === "PH"
+    ).length;
+    const totalBP = users.filter((user) => user.city === "BP").length;
+
+    Alert.alert(
+      "Quantidade de usuários",
+      `Total: ${totalUsuarios}\nTotal VR: ${totalVR}\nTotal BM e PH: ${totalBMOuPH}\nTotal BP: ${totalBP}`,
+      [
+        {
+          text: "OK",
+          style: "default",
+        },
+      ]
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.eventName}>
-        Cadastro de Usuários
-      </Text>
+      <Text style={styles.eventName}>Cadastro de Usuários</Text>
 
       <View style={styles.form}>
         <TextInput
           style={styles.input}
           placeholder="Nome do usuário"
-          placeholderTextColor='#6B6B6B'
+          placeholderTextColor="#6B6B6B"
           autoCapitalize="words"
           value={name}
-          onChangeText={value => setName(value)}
+          onChangeText={(value) => setName(value)}
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="CPF"
+          placeholderTextColor="#6B6B6B"
+          value={cpf}
+          onChangeText={(value) => setCPF(value)}
         />
 
         <TextInput
           style={styles.input}
           placeholder="Email do usuário"
-          placeholderTextColor='#6B6B6B'
+          placeholderTextColor="#6B6B6B"
           autoCapitalize="none"
           value={email}
-          onChangeText={value => setEmail(value)}
+          onChangeText={(value) => setEmail(value)}
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Cidade do usuário"
-          placeholderTextColor='#6B6B6B'
-          // keyboardType="numeric"
-          value={city}
-          onChangeText={value => setCity(value)}
-        />
+        <Select onSelectCity={handleCityFromSelect} />
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleAddNewUser}>
-          <Text style={styles.buttonText}>
-            Incluir
-          </Text>
+        <TouchableOpacity style={styles.button} onPress={handleAddNewUser}>
+          <Text style={styles.buttonText}>Incluir</Text>
         </TouchableOpacity>
-
       </View>
 
       <FlatList
         data={users}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <Users
-            data={item}
-            onRemove={() => handleRemoveUser(item.id)}
-          />
+          <Users data={item} onRemove={() => handleRemoveUser(item.id)} />
         )}
-
       />
 
-
-      <TouchableOpacity
-        style={styles.button}>
-        <Text style={styles.buttonText}>
-          Total
-        </Text>
+      <TouchableOpacity style={styles.button} onPress={handleTotal}>
+        <Text style={styles.buttonText}>Total</Text>
       </TouchableOpacity>
-
     </View>
-  )
-}
-
-
+  );
+};
