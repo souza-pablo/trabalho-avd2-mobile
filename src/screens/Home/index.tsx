@@ -97,11 +97,11 @@ export const Home = () => {
     const totalBMOuPH = users.filter(
       (user) => user.city === "BM" || user.city === "PH"
     ).length;
-    const totalBP = users.filter((user) => user.city === "BP").length;
+    const totalNaoBP = users.filter((user) => user.city !== "BP").length;
 
     Alert.alert(
       "Quantidade de usuários",
-      `Total: ${totalUsuarios}\nTotal VR: ${totalVR}\nTotal BM e PH: ${totalBMOuPH}\nTotal BP: ${totalBP}`,
+      `Total: ${totalUsuarios}\nTotal VR: ${totalVR}\nTotal BM e PH: ${totalBMOuPH}\nTotal Não BP: ${totalNaoBP}`,
       [
         {
           text: "OK",
